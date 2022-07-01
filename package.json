@@ -1,0 +1,42 @@
+{
+  "name": "generate-toc-from-nmredata",
+  "version": "0.0.0",
+  "description": "generate a toc from a nmredata file",
+  "private": true,
+  "scripts": {
+    "eslint": "eslint src",
+    "eslint-fix": "npm run eslint -- --fix",
+    "prettier": "prettier --check src",
+    "prettier-write": "prettier --write src",
+    "test": "npm run test-only && npm run eslint && npm run prettier",
+    "test-only": "jest --coverage"
+  },
+  "eslintConfig": {
+    "extends": "cheminfo-react",
+    "parser": "babel-eslint",
+    "rules": {
+      "import/no-unresolved": "off"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jobo322/generate-toc-from-nmredata.git"
+  },
+  "keywords": [],
+  "author": "jobo322",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jobo322/generate-toc-from-nmredata/issues"
+  },
+  "homepage": "https://github.com/jobo322/generate-toc-from-nmredata#readme",
+  "jest": {
+    "testEnvironment": "node"
+  },
+  "devDependencies": {
+    "@types/jest": "^28.1.4",
+    "eslint": "^8.18.0",
+    "eslint-config-cheminfo": "^8.0.1",
+    "jest": "^28.1.2",
+    "prettier": "^2.7.1"
+  }
+}
