@@ -10,7 +10,7 @@ const { writeFileSync } = require('fs');
 
 const { parse, stringify } = JSON;
 
-const pathToFiles = join(__dirname, '../dataTest/');
+const pathToFiles = join(__dirname, '../data/');
 const pathToWrite = join(__dirname, '../');
 
 const fileList = fileListFromPath(pathToFiles);
@@ -22,8 +22,9 @@ const fileList = fileListFromPath(pathToFiles);
     const sdf = parseSDF(sdfData);
     const { molecules, ...restMainSDF } = sdf;
     let counter = 0;
-
+    console.log(molecules.length)
     for (const currentSDF of molecules) {
+      // console.time('molecule')
       const nmredata = NmrRecord.getNMReData({ molecules: [currentSDF], ...restMainSDF });
       // console.log(nmredata)
       const json = await NmrRecord.toJSON({ sdf: { molecules: [currentSDF], ...restMainSDF } });
@@ -54,6 +55,7 @@ const fileList = fileListFromPath(pathToFiles);
       });
       counter++;
       console.log(`progress: ${counter / molecules.length * 100} %`);
+      // console.timeEnd('molecule');
     }
   }
 
