@@ -9,8 +9,6 @@ const { writeFileSync } = require('fs');
 
 const { Piscina } = require('piscina');
 
-const { parse, stringify } = JSON;
-
 const maxThreads = 5;
 
 const pathToFiles = join(__dirname, '../data/');
@@ -19,7 +17,7 @@ const pathToWrite = join(__dirname, '../');
 const fileList = fileListFromPath(pathToFiles);
 
 const piscina = new Piscina({
-    filename: resolve(join(__dirname, 'worker.js')),
+    filename: resolve(join(__dirname, 'getTocWorker.js')),
 });
 
 (async (fileList, piscina) => {

@@ -13,7 +13,9 @@ async function getToc(options) {
     let counter = 1;
     const { workerID, molecules, restMainSDF } = options;
     for (const currentSDF of molecules) {
-        writeFileSync(`worker${workerID}_log.json`,`${JSON.stringify(currentSDF)}`)
+        if (counter++ < 1405) continue;
+        console.log(counter)
+        // writeFileSync(`worker${workerID}_log.json`,`${JSON.stringify(currentSDF)}`)
         const nmredata = NmrRecord.getNMReData({ molecules: [currentSDF], ...restMainSDF });
         // console.log(nmredata)
         const json = await NmrRecord.toJSON({ sdf: { molecules: [currentSDF], ...restMainSDF } });
@@ -29,7 +31,7 @@ async function getToc(options) {
         } = json.spectra[0];
 
         const meta = getMetadata({ nmredata, toExclude: ['assignment', 'version', 'name', 'smiles', 'nucleus', 'solvent'] })
-        const solvent = nmredata.SOLVENT ? nmredata.SOLVENT.data[0].value : '';
+        const solvent = getSolventName(nmredata.SOLVENT);
         const signalsWithNbAtoms = setNbAtoms(signals, diaIDs);
         const ranges = signalsToRanges(signalsWithNbAtoms)
 
@@ -46,12 +48,15 @@ async function getToc(options) {
     return toc;
 }
 
+function getSolventName(tagData = {}) {
+    return tagData.data.length > 0 ? tagData.data[0].value : '';
+}
 
 function setNbAtoms(signals, diaIDs) {
     const result = parse(stringify(signals));
     for (const signal of result) {
         let nbAtoms = 1;
-        if (signal.diaIDs.length > 1) {
+        if (signal.diaIDs && signal.diaIDs.length > 0) {
             const diaID = signal.diaIDs[0];
             const info = diaIDs.find((data) => {
                 return data.oclID === diaID;
