@@ -24,9 +24,12 @@ const fileList = fileListFromPath(pathToFiles);
     let counter = 0;
     console.log(molecules.length)
     for (const currentSDF of molecules) {
+      counter++;
+      if (counter < 1204) continue;
       // console.time('molecule')
       const nmredata = NmrRecord.getNMReData({ molecules: [currentSDF], ...restMainSDF });
-      // console.log(nmredata)
+      // console.log(nmredata.ASSIGNMENT.data.map(d => d.value))
+      console.log(currentSDF);
       const json = await NmrRecord.toJSON({ sdf: { molecules: [currentSDF], ...restMainSDF } });
 
       const { smiles, molfile } = json.molecules[0];
@@ -53,8 +56,8 @@ const fileList = fileListFromPath(pathToFiles);
         names: molfile.split('\n').slice(0, 1),
         meta: { experiment, frequency, ...meta },
       });
-      counter++;
-      console.log(`progress: ${counter / molecules.length * 100} %`);
+      
+      console.log(`progress: ${counter / molecules.length * 100} % ${counter}`);
       // console.timeEnd('molecule');
     }
   }

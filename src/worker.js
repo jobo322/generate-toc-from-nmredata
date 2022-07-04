@@ -6,12 +6,14 @@ const { Molecule: OCLMolecule } = require('openchemlib/core');
 const { getGroupedDiastereotopicAtomIDs } = require('openchemlib-utils');
 
 const { parse, stringify } = JSON;
+const { writeFileSync } = require('fs');
 
 async function getToc(options) {
     const toc = [];
-    const { molecules, restMainSDF } = options;
+    let counter = 1;
+    const { workerID, molecules, restMainSDF } = options;
     for (const currentSDF of molecules) {
-        // console.time('molecule')
+        writeFileSync(`worker${workerID}_log.json`,`${JSON.stringify(currentSDF)}`)
         const nmredata = NmrRecord.getNMReData({ molecules: [currentSDF], ...restMainSDF });
         // console.log(nmredata)
         const json = await NmrRecord.toJSON({ sdf: { molecules: [currentSDF], ...restMainSDF } });

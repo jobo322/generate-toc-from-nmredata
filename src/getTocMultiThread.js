@@ -11,9 +11,9 @@ const { Piscina } = require('piscina');
 
 const { parse, stringify } = JSON;
 
-const maxThreads = 2;
+const maxThreads = 5;
 
-const pathToFiles = join(__dirname, '../dataTest/');
+const pathToFiles = join(__dirname, '../data/');
 const pathToWrite = join(__dirname, '../');
 
 const fileList = fileListFromPath(pathToFiles);
@@ -37,8 +37,9 @@ const piscina = new Piscina({
         }
         for (let i = 0; i < list.length; i++) {
             promises.push(
-                piscina.run({ molecules: list[i], restMainSDF }, { name: 'getToc' })
+                piscina.run({ workerID: i, molecules: list[i], restMainSDF }, { name: 'getToc' })
             )
+            // list[i] = null;
         }
     }
 
