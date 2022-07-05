@@ -9,13 +9,13 @@ const { parse, stringify } = JSON;
 const { writeFileSync } = require('fs');
 
 async function getToc(options) {
-    const toc = [];
+    const generalToc = [];
+    const carbonToc = [];
+    const protonToc = [];
     let counter = 1;
     const { workerID, molecules, restMainSDF } = options;
     for (const currentSDF of molecules) {
-        if (counter++ < 1405) continue;
-        console.log(counter)
-        // writeFileSync(`worker${workerID}_log.json`,`${JSON.stringify(currentSDF)}`)
+        writeFileSync(`worker${workerID}_log.json`,`${JSON.stringify(currentSDF)}`)
         const nmredata = NmrRecord.getNMReData({ molecules: [currentSDF], ...restMainSDF });
         // console.log(nmredata)
         const json = await NmrRecord.toJSON({ sdf: { molecules: [currentSDF], ...restMainSDF } });
@@ -23,29 +23,32 @@ async function getToc(options) {
         const { smiles, molfile } = json.molecules[0];
         const molecule = OCLMolecule.fromMolfile(molfile);
         const diaIDs = getGroupedDiastereotopicAtomIDs(molecule);
-        const {
-            nucleus,
-            signals = [],
-            frequency = 400,
-            experiment,
-        } = json.spectra[0];
+        for (const spectrum of json.spectra) {
+            const {
+                nucleus,
+                signals = [],
+                frequency = 400,
+                experiment,
+            } = spectrum;
+            const meta = getMetadata({ nmredata, toExclude: ['assignment', 'version', 'name', 'smiles', 'nucleus', 'solvent'] })
+            const solvent = getSolventName(nmredata.SOLVENT);
+            const signalsWithNbAtoms = setNbAtoms(signals, diaIDs);
+            const ranges = signalsToRanges(signalsWithNbAtoms);
 
-        const meta = getMetadata({ nmredata, toExclude: ['assignment', 'version', 'name', 'smiles', 'nucleus', 'solvent'] })
-        const solvent = getSolventName(nmredata.SOLVENT);
-        const signalsWithNbAtoms = setNbAtoms(signals, diaIDs);
-        const ranges = signalsToRanges(signalsWithNbAtoms)
+            let referenceToc = nucleus === '1H' ? protonToc : nucleus === '13C' ? carbonToc : generalToc;
 
-        toc.push({
-            ocl: molecule.getIDCodeAndCoordinates(),
-            ranges,
-            smiles: Array.isArray(smiles) ? smiles[0] : smiles,
-            nucleus,
-            solvent,
-            names: molfile.split('\n').slice(0, 1),
-            meta: { experiment, frequency, ...meta },
-        });
+            referenceToc.push({
+                ocl: molecule.getIDCodeAndCoordinates(),
+                ranges,
+                smiles: Array.isArray(smiles) ? smiles[0] : smiles,
+                nucleus,
+                solvent,
+                names: molfile.split('\n').slice(0, 1),
+                meta: { experiment, frequency, ...meta },
+            });
+        }
     }
-    return toc;
+    return { protonToc, generalToc, carbonToc };
 }
 
 function getSolventName(tagData = {}) {

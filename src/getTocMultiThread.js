@@ -37,16 +37,23 @@ const piscina = new Piscina({
             promises.push(
                 piscina.run({ workerID: i, molecules: list[i], restMainSDF }, { name: 'getToc' })
             )
-            // list[i] = null;
+            list[i] = null;
         }
     }
 
     await Promise.all(promises).then((result) => {
-        const toc = [];
+        const carbonTotalToc = [];
+        const generalTotalToc = [];
+        const protonTotalToc = [];
         for (let t of result) {
-            toc.push(...t);
+            const { protonToc, generalToc, carbonToc } = t;
+            carbonTotalToc.push(...carbonToc);
+            protonToc.push(...protonToc);
+            generalTotalToc.push(...generalToc);
         }
-        writeFileSync(join(pathToWrite, 'toc_nmrshiftDB.json'), JSON.stringify(toc));
+        writeFileSync(join(pathToWrite, 'proton_toc_nmrshiftDB.json'), JSON.stringify(protonTotalToc));
+        writeFileSync(join(pathToWrite, 'carbon_toc_nmrshiftDB.json'), JSON.stringify(carbonTotalToc));
+        writeFileSync(join(pathToWrite, 'general_toc_nmrshiftDB.json'), JSON.stringify(generalTotalToc));
     });
 
 })(fileList, piscina)
