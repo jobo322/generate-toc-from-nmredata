@@ -12,10 +12,10 @@ async function getToc(options) {
     const generalToc = [];
     const carbonToc = [];
     const protonToc = [];
-    let counter = 1;
+    // let counter = 1;
     const { workerID, molecules, restMainSDF } = options;
     for (const currentSDF of molecules) {
-        writeFileSync(`worker${workerID}_log.json`,`${JSON.stringify(currentSDF)}`)
+        // writeFileSync(`worker${workerID}_log.json`,`${JSON.stringify(currentSDF)}`)
         const nmredata = NmrRecord.getNMReData({ molecules: [currentSDF], ...restMainSDF });
         // console.log(nmredata)
         const json = await NmrRecord.toJSON({ sdf: { molecules: [currentSDF], ...restMainSDF } });
@@ -36,9 +36,10 @@ async function getToc(options) {
             const ranges = signalsToRanges(signalsWithNbAtoms);
 
             let referenceToc = nucleus === '1H' ? protonToc : nucleus === '13C' ? carbonToc : generalToc;
-
+            const index = molecule.getIndex();
+            const oclObject = molecule.getIDCodeAndCoordinates();
             referenceToc.push({
-                ocl: molecule.getIDCodeAndCoordinates(),
+                ocl: { index: Array.from(index), ...oclObject },
                 ranges,
                 smiles: Array.isArray(smiles) ? smiles[0] : smiles,
                 nucleus,

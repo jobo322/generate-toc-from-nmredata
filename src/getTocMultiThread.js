@@ -9,7 +9,7 @@ const { writeFileSync } = require('fs');
 
 const { Piscina } = require('piscina');
 
-const maxThreads = 5;
+const maxThreads = 2;
 
 const pathToFiles = join(__dirname, '../data/');
 const pathToWrite = join(__dirname, '../');
@@ -55,5 +55,4 @@ const piscina = new Piscina({
         writeFileSync(join(pathToWrite, 'carbon_toc_nmrshiftDB.json'), JSON.stringify(carbonTotalToc));
         writeFileSync(join(pathToWrite, 'general_toc_nmrshiftDB.json'), JSON.stringify(generalTotalToc));
     });
-
 })(fileList, piscina)
